@@ -62,8 +62,8 @@
                     }, // Put date and time details entered by user
                     success: function (data) { // Executed upon response from backend
                         if (data['success']) { // If success is true, so set time reached
-                            alert("Alarm done.");
-
+                            var audio = new Audio('alarm.wav'); // Open alarm.wav as audio
+                            audio.play(); // Play audio
                             $('.setButton').removeAttr("disabled");
                             $('.cancelButton').attr("disabled",true);
                         }
