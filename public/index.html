@@ -1,0 +1,81 @@
+<!DOCTYPE html>
+<html>
+    <head lang="en">
+        <meta charset="utf-8">
+        <title>Alarm</title>
+        <link rel="stylesheet" href="styles.css">
+    </head>
+    <body>
+        <section>
+            <div class="field">
+                <label for="date">Date</label>
+                <br/>
+                <input type="date" class="date">
+            </div>
+            <div class="field">
+                <label for="hour">Hour</label>
+                <br/>
+                <input type="number" class="hour" min="0" max="23"/>
+            </div>
+    
+            <div class="field">
+                <label for="minute">Minute</label>
+                <br/>
+                <input type="number" class="minute" min="0" max="59"/>
+            </div>    
+
+            <br/>
+            <button type="button" class="setButton">Set</button>
+            <button type="button" class="cancelButton" disabled>Cancel</button>
+        </section>
+
+        <script src="https://ajax.googleapis.com/ajax/libs/jquery/3.6.3/jquery.min.js"></script>
+        <script>
+            var d = new Date(); // New Date object
+            var day = d.getDate(); // Get current date
+            var month = d.getMonth()+1; // Get current month, add 1 so it is between 1 and 12
+            if (day < 10) { day = "0"+day; } // If day is less than 10, so a single digit, add 0 before so it works with date input element
+            if (month < 10) { month = "0"+month; } //
+            var today = d.getFullYear()+"-"+month+"-"+day; // Format
+            $('.date').attr({
+                value: today,
+                min: today
+            }); // Set minimum and current value of date element to today's date
+
+            $('.hour').val(d.getHours()); // Set value of hour element to current hour
+            $('.minute').val(d.getMinutes());
+
+            var xhr; // Abbreviation for XMLHTTPRequest, used to store AJAX request
+
+            $(".setButton").click(function() { // When set button is clicked, execute function
+                var d = new Date($('.date').val()); // Convert entered date into Date object
+                $('.setButton').attr("disabled",true); // Disable set button
+                $('.cancelButton').removeAttr("disabled"); // Enable cancel button
+                xhr = $.ajax({ // Make AJAX request to backend
+                    url: "start",
+                    data: {
+                        year: d.getFullYear(),
+                        month: d.getMonth()+1,
+                        day: d.getDate(),
+                        hour: $(".hour").val(),
+                        minute: $(".minute").val()
+                    }, // Put date and time details entered by user
+                    success: function (data) { // Executed upon response from backend
+                        if (data['success']) { // If success is true, so set time reached
+                            alert("Alarm done.");
+
+                            $('.setButton').removeAttr("disabled");
+                            $('.cancelButton').attr("disabled",true);
+                        }
+                    }
+                });
+            });
+
+            $(".cancelButton").click(function () { // If cancel button clicked
+                $('.setButton').removeAttr("disabled");
+                $('.cancelButton').attr("disabled",true);
+                xhr.abort(); // Abort AJAX request
+            });
+        </script>
+    </body>
+</html>
